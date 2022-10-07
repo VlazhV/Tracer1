@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example", "Example\Example.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", "{934433E0-4785-498F-8FED-1527186AE96F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serialization.Abstraction", "Serialization.Abstraction\Serialization.Abstraction.csproj", "{744A4818-D366-4801-8953-B85FAE2AFBFE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serialization.Abstraction", "Serialization.Abstraction\Serialization.Abstraction.csproj", "{744A4818-D366-4801-8953-B85FAE2AFBFE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

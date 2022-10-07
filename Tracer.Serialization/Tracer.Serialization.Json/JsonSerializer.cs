@@ -15,6 +15,7 @@ namespace Tracer.Serialization.Json
 			string json = System.Text.Json.JsonSerializer.Serialize( traceResult );
 			to.Write( Encoding.UTF8.GetBytes( json ), 0, json.Length );
 			
+
 		}
 	}
 }

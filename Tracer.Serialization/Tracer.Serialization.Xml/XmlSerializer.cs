@@ -1,5 +1,4 @@
-﻿using Core;
-using Serialization.Abstraction;
+﻿using Serialization.Abstraction;
 
 namespace Tracer.Serialization.Xml
 {
@@ -8,11 +7,12 @@ namespace Tracer.Serialization.Xml
 		private string format = "xml";
 		public string Format { get { return format; } }
 
-		public void Serialize( TraceResult traceResult, Stream to )
+		public void Serialize( Core.TraceResult traceResult, Stream to )
 		{
 			System.Xml.Serialization.XmlSerializer xmlSerializer = new System.Xml.Serialization.XmlSerializer( typeof( TraceResult ) );
-			xmlSerializer.Serialize(to, traceResult);
+			xmlSerializer.Serialize(to, new TraceResult(traceResult));
 
 		}
+
 	}
 }

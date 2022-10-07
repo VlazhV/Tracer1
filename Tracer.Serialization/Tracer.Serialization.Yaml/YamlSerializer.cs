@@ -1,5 +1,8 @@
 ﻿using Core;
 using Serialization.Abstraction;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
+
 
 namespace Tracer.Serialization.Yaml
 {
@@ -10,7 +13,10 @@ namespace Tracer.Serialization.Yaml
 
 		public void Serialize( TraceResult traceResult, Stream to )
 		{
-			throw new NotImplementedException();
+			var serializer = new SerializerBuilder().WithNamingConvention(CamelCaseNamingConvention.Instance).Build();
+			using TextWriter textWriter = new StreamWriter( to );
+			serializer.Serialize( textWriter, traceResult );
+
 		}
 	}
 }

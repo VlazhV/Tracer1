@@ -10,6 +10,9 @@ namespace Core
 	{
 		//IReadOnlyList<MethodData> _traceInfo;
 		IReadOnlyDictionary<int, List<MethodData>> _traceInfo;
+
+		public IReadOnlyDictionary<int, List<MethodData>> TraceInfo { get { return _traceInfo; } set { _traceInfo = value; } }
+
 		public TraceResult( Dictionary<int, List<MethodData>> traceInfo )
 		{
 			_traceInfo = traceInfo;
