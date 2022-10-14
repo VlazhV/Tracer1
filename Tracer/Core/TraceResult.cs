@@ -10,7 +10,7 @@ namespace Core
 	{
 		IReadOnlyList<ThreadData> _traceInfo;
 
-		public IReadOnlyList<ThreadData> TraceInfo { get { return _traceInfo; }  }
+		public IReadOnlyList<ThreadData> TraceInfo { get { return _traceInfo; } set { _traceInfo = value; } }
 
 		public TraceResult( IReadOnlyList<ThreadData> traceInfo )
 		{

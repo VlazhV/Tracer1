@@ -10,18 +10,18 @@ public class TraceResult
 {
 
     public TraceResult()
-    {
-
+    { 
     }
 
     // Core.TraceResult traceResult
-    IReadOnlyList<ThreadData> _traceInfo;
+    List<ThreadData> _traceInfo;
 
-    public IReadOnlyList<ThreadData> TraceInfo { get { return _traceInfo; } set { _traceInfo = value; } }
+    public List<ThreadData> TraceInfo { get { return _traceInfo; } set { _traceInfo = value; } }
 
     public TraceResult( Core.TraceResult traceResult )
     {
-        //_traceInfo = traceResult.TraceInfo;
+        foreach( Core.ThreadData threadData in traceResult.TraceInfo )
+            TraceInfo.Add( new ThreadData(threadData));
     }
 
 }

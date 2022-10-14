@@ -6,7 +6,7 @@ namespace Core
 	{
 		int _id;
 		long _timeMs;
-		List<MethodData> _methods;
+		List<MethodData> _methods = new();
 
 		public int Id 
 		{ 
@@ -24,8 +24,6 @@ namespace Core
 
 		public void AddMethod(MethodData methodData)
 		{
-			if (_methods == null)
-				_methods = new List<MethodData>();
 			_methods.Add(methodData);
 		}
 

@@ -61,8 +61,6 @@ namespace Core
 
 		public void AddInternalMethod(MethodData methodData)
 		{
-			if ( _internalMethods == null )
-				_internalMethods = new();
 			_internalMethods.Add( methodData );
 		}
 

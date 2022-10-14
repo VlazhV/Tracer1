@@ -16,7 +16,7 @@ namespace Core
 		
 		private MethodData _currentMethodData;
 		private MethodData _prevStackMethodData;
-		private bool _isRecursive = false;
+
 
 
 
@@ -38,20 +38,21 @@ namespace Core
 		
 		public void Start()
 		{
-			_prevStackMethodData = null;
+			
 			int currentThreadId = Thread.CurrentThread.ManagedThreadId;			
 			Stopwatch stopWatch = new Stopwatch();
 
-			_isRecursive = !_traceStack.IsEmpty;
-			 
+
+			_currentMethodData = GetFrameInfo();
+			_traceStack.Push( ( currentThreadId, _currentMethodData, stopWatch) );
 			
-			_traceStack.Push( ( currentThreadId, GetFrameInfo(), stopWatch) );
+			
 			stopWatch.Start();
 		}
 
 		public void Stop()
 		{
-			_isRecursive = false;
+		
 			//_stopWatch.Stop();
 			if ( !_traceStack.TryPop( out var result ) )
 				throw new NullReferenceException( "Trace Stack is empty" );
@@ -60,9 +61,9 @@ namespace Core
 			stopWatch.Stop();
 
 			_currentMethodData = result.Item2 as MethodData;
-		//	if (_isRecursive)
-			if (_prevStackMethodData != null)
-				_currentMethodData.AddInternalMethod( _prevStackMethodData );
+
+			_currentMethodData.AddInternalMethod( _prevStackMethodData );
+
 			_currentMethodData.TimeMs = stopWatch.ElapsedMilliseconds;
 			int currentThreadId = result.Item1;
 
@@ -76,12 +77,18 @@ namespace Core
 					}
 				if (!isUsed)				
 					_threadData.Add( new ThreadData( currentThreadId, _currentMethodData ) );
-				
 
-				_isRecursive = false;
 			}
 			else
-				_prevStackMethodData = _currentMethodData.Clone();
+			{
+				if ( _traceStack.TryPop( out var prev ))
+				{
+					prev.Item2.AddInternalMethod( _currentMethodData );
+					_traceStack.Push( prev );
+				}
+				
+			}
+				
 		}
 
 

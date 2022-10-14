@@ -3,7 +3,7 @@ using System.Xml.Serialization;
 
 namespace Tracer.Serialization.Xml
 {
-	[XmlRoot(ElementName = "Root")]
+	[XmlRoot(ElementName = "Thread")]
 	public class ThreadData
 	{
 
@@ -17,10 +17,10 @@ namespace Tracer.Serialization.Xml
 		[XmlAttribute( Form = XmlSchemaForm.Unqualified )]
 		public long TimeMs { get; set; }
 
-		[XmlAttribute( Form = XmlSchemaForm.Unqualified )]
-		public List<MethodData>? Methods { get; }
+		[XmlElement(ElementName = "Method" )]
+		public List<MethodData> Methods { get; }
 
-		public ThreadData(int id, long timeMS, List<MethodData>? methodDatas)
+		public ThreadData(int id, long timeMS, List<MethodData> methodDatas)
 		{
 			Id = id;	
 			TimeMs = timeMS;
@@ -32,5 +32,13 @@ namespace Tracer.Serialization.Xml
 
 		}
 
+		public ThreadData(Core.ThreadData threadData)
+		{
+			Id = threadData.Id;
+			TimeMs = threadData.TimeMs;
+			foreach ( var methodData in threadData.Methods )
+				Methods.Add( new MethodData(methodData) );
+
+		}
 	}
 }

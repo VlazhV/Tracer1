@@ -14,7 +14,7 @@ namespace Example
         public void InnerMethod1()
         {
             _tracer.Start();            
-            Thread.Sleep( 150 );
+            Thread.Sleep( 200 );
             _tracer.Stop();
         }
 
@@ -28,7 +28,7 @@ namespace Example
         public void InnerMethod3()
         {
             _tracer.Start();
-            Thread.Sleep( 150 );
+            Thread.Sleep( 100 );
             _tracer.Stop();
         }
     }

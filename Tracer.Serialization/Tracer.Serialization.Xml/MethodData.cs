@@ -13,7 +13,7 @@ namespace Tracer.Serialization.Xml
         [XmlAttribute( Form = XmlSchemaForm.Unqualified )]
         public string TimeMs { get; set; } = "";
 
-        [XmlAttribute( Form = XmlSchemaForm.Unqualified )]
+        [XmlElement( ElementName = "Method" )]
         public string MethodName { get; set; } = "";
 
         [XmlAttribute( Form = XmlSchemaForm.Unqualified )]
@@ -33,6 +33,13 @@ namespace Tracer.Serialization.Xml
         {
 
         }
+
+        public MethodData(Core.MethodData methodData)
+        {
+            MethodName = methodData.MethodName;
+            ClassName = methodData.ClassName;
+            TimeMs = $"{methodData.TimeMs}ms";
+		}
 
 
 
