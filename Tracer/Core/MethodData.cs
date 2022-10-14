@@ -13,7 +13,7 @@ namespace Core
 		string _className;
 		long _timeMs;
 
-		List<MethodData>? internalMethods = null;
+		List<MethodData> _internalMethods = new();
 		
 
 
@@ -33,11 +33,22 @@ namespace Core
 			get { return _className; }	
 		}
 
+		public List<MethodData> Methods { get { return _internalMethods; } }
+
 		public MethodData(string methodName, string className){
 			_methodName = methodName;
 
 			_className = className;
 			
+		}
+
+		private MethodData( string methodName, string className, long timeMs, List<MethodData> methodDatas )
+		{
+			_methodName = methodName;
+			_className = className;
+			_timeMs = timeMs;
+			_internalMethods = methodDatas;
+
 		}
 
 		public override bool Equals( object? md )
@@ -50,11 +61,15 @@ namespace Core
 
 		public void AddInternalMethod(MethodData methodData)
 		{
-			if ( internalMethods == null )
-				internalMethods = new();
-			internalMethods.Add( methodData );
+			if ( _internalMethods == null )
+				_internalMethods = new();
+			_internalMethods.Add( methodData );
 		}
 
+		public MethodData Clone()
+		{
+			return new MethodData( _methodName, _className, _timeMs, _internalMethods );
+		}
 		
 
 	}

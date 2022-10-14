@@ -14,9 +14,6 @@ namespace Core
 		private ConcurrentStack<(int, MethodData, Stopwatch)> _traceStack = new ConcurrentStack<(int, MethodData, Stopwatch)>();
 		
 		
-		
-		private Stopwatch _stopWatch;
-		private int _currentThreadId;
 		private MethodData _currentMethodData;
 		private MethodData _prevStackMethodData;
 		private bool _isRecursive = false;
@@ -25,7 +22,15 @@ namespace Core
 
 		public TraceResult Result()
 		{
+			
+			foreach (var threadData in _threadData)
+			{
+				long threadTimeMs = 0;
+				foreach (var method in threadData.Methods)				
+					threadTimeMs += method.TimeMs;
+				threadData.TimeMs = threadTimeMs;
 
+			}
 			TraceResult traceResult = new( _threadData );
 			return traceResult;
 		}
@@ -33,54 +38,58 @@ namespace Core
 		
 		public void Start()
 		{
+			_prevStackMethodData = null;
+			int currentThreadId = Thread.CurrentThread.ManagedThreadId;			
+			Stopwatch stopWatch = new Stopwatch();
 
-			_currentThreadId = Thread.CurrentThread.ManagedThreadId;			
-			_stopWatch = new Stopwatch();
-
-			_isRecursive = _traceStack.IsEmpty;
+			_isRecursive = !_traceStack.IsEmpty;
 			 
 			
-			_traceStack.Push( ( _currentThreadId, GetFrameInfo(), _stopWatch) );
-			_stopWatch.Start();
+			_traceStack.Push( ( currentThreadId, GetFrameInfo(), stopWatch) );
+			stopWatch.Start();
 		}
 
 		public void Stop()
 		{
-
+			_isRecursive = false;
 			//_stopWatch.Stop();
 			if ( !_traceStack.TryPop( out var result ) )
 				throw new NullReferenceException( "Trace Stack is empty" );
 
-			_stopWatch = result.Item3 as Stopwatch;
-			_stopWatch.Stop();
+			Stopwatch stopWatch = result.Item3 as Stopwatch;
+			stopWatch.Stop();
 
 			_currentMethodData = result.Item2 as MethodData;
-			_currentMethodData.AddInternalMethod( _prevStackMethodData );
-			_currentThreadId = result.Item1;
+		//	if (_isRecursive)
+			if (_prevStackMethodData != null)
+				_currentMethodData.AddInternalMethod( _prevStackMethodData );
+			_currentMethodData.TimeMs = stopWatch.ElapsedMilliseconds;
+			int currentThreadId = result.Item1;
 
 			bool isUsed = false;
-			if ( !_traceStack.IsEmpty ) {
+			if ( _traceStack.IsEmpty ) {
 				foreach ( var threadData in _threadData )
-					if ( threadData.Id == _currentThreadId )
+					if ( threadData.Id == currentThreadId )
 					{
 						threadData.AddMethod( _currentMethodData );
 						isUsed = true;
 					}
 				if (!isUsed)				
-					_threadData.Add( new ThreadData( _currentThreadId, _currentMethodData ) );
+					_threadData.Add( new ThreadData( currentThreadId, _currentMethodData ) );
 				
 
 				_isRecursive = false;
 			}
 			else
-				_prevStackMethodData = _currentMethodData;
+				_prevStackMethodData = _currentMethodData.Clone();
 		}
 
 
 		private MethodData GetFrameInfo()
 		{
 			StackTrace stackTrace = new StackTrace();
-			var frame = stackTrace.GetFrame( 2 );
+			var frame = stackTrace.GetFrame( 2 );			
+				
 			string methodName = frame.GetMethod().Name;
 			string className = frame.GetMethod().ReflectedType.Name;
 

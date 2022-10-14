@@ -11,10 +11,24 @@ namespace Example
             _tracer = tracer;
         }
 
-        public void InnerMethod()
+        public void InnerMethod1()
         {
             _tracer.Start();            
-            Thread.Sleep( 100 );
+            Thread.Sleep( 150 );
+            _tracer.Stop();
+        }
+
+        public void InnerMethod2()
+        {
+            _tracer.Start();
+            Thread.Sleep( 150 );
+            _tracer.Stop();
+        }
+
+        public void InnerMethod3()
+        {
+            _tracer.Start();
+            Thread.Sleep( 150 );
             _tracer.Stop();
         }
     }

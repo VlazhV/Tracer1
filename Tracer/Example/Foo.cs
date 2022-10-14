@@ -20,9 +20,10 @@ namespace Example
         public void DoSomething()
         {
             _tracer.Start();
-            bar.InnerMethod();
+            bar.InnerMethod1();
             Thread.Sleep( 2000 );
-            bar.InnerMethod();
+            bar.InnerMethod2();
+            bar.InnerMethod3();
             _tracer.Stop();
         }
     }

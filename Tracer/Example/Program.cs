@@ -23,12 +23,11 @@ namespace Example
             Thread thread;
 
 
-            thread = new Thread( foo.DoSomething );
-            thread.Start();
-
-            
-            thread.Join();
-
+  //          thread = new Thread( foo.DoSomething );
+       //     thread.Start();
+            foo.DoSomething();
+  //          thread.Join();
+            foo.DoSomething();
             foo.DoSomething();
 
             TraceResult traceResult = tracer.Result();

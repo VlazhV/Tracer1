@@ -6,7 +6,7 @@ namespace Core
 	{
 		int _id;
 		long _timeMs;
-		List<MethodData>? _methods = null;
+		List<MethodData> _methods;
 
 		public int Id 
 		{ 
