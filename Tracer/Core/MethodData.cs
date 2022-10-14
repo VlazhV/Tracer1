@@ -13,6 +13,10 @@ namespace Core
 		string _className;
 		long _timeMs;
 
+		List<MethodData>? internalMethods = null;
+		
+
+
 		public long TimeMs 
 		{ 
 			get { return _timeMs; } 
@@ -42,6 +46,13 @@ namespace Core
 			var md1 = (MethodData)md;
 			return _methodName == md1._methodName &&
 				   _className == md1._className;				   
+		}
+
+		public void AddInternalMethod(MethodData methodData)
+		{
+			if ( internalMethods == null )
+				internalMethods = new();
+			internalMethods.Add( methodData );
 		}
 
 		

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -8,72 +9,73 @@ using System.Threading.Tasks;
 namespace Core
 {
 	public class Tracer : ITracer
-	{
-		private bool _isRunning = false;
-		private Dictionary<int, List<MethodData>>_tempMethodInfo = new();
+	{		
+		private List<ThreadData> _threadData = new();
+		private ConcurrentStack<(int, MethodData, Stopwatch)> _traceStack = new ConcurrentStack<(int, MethodData, Stopwatch)>();
+		
 		
 		
 		private Stopwatch _stopWatch;
 		private int _currentThreadId;
 		private MethodData _currentMethodData;
-		
+		private MethodData _prevStackMethodData;
+		private bool _isRecursive = false;
+
+
 
 		public TraceResult Result()
 		{
-			if ( !_isRunning )
-			{
-				TraceResult traceResult = new( _tempMethodInfo );
-				return traceResult;
-			}
-			throw new Exception();
+
+			TraceResult traceResult = new( _threadData );
+			return traceResult;
 		}
 
 		
 		public void Start()
 		{
-			if ( _isRunning ) return;
 
-			_currentThreadId = Thread.CurrentThread.ManagedThreadId;
-
-			_currentMethodData = GetFrameInfo();
-			_isRunning = true;
+			_currentThreadId = Thread.CurrentThread.ManagedThreadId;			
 			_stopWatch = new Stopwatch();
+
+			_isRecursive = _traceStack.IsEmpty;
+			 
+			
+			_traceStack.Push( ( _currentThreadId, GetFrameInfo(), _stopWatch) );
 			_stopWatch.Start();
 		}
 
 		public void Stop()
 		{
-			
-			if (! _isRunning) return;
+
+			//_stopWatch.Stop();
+			if ( !_traceStack.TryPop( out var result ) )
+				throw new NullReferenceException( "Trace Stack is empty" );
+
+			_stopWatch = result.Item3 as Stopwatch;
 			_stopWatch.Stop();
-			
-			var checkMethodData = GetFrameInfo();
-			var threadId = Thread.CurrentThread.ManagedThreadId;
 
-			if ( !checkMethodData.Equals( _currentMethodData ) || (threadId != _currentThreadId)) return;
+			_currentMethodData = result.Item2 as MethodData;
+			_currentMethodData.AddInternalMethod( _prevStackMethodData );
+			_currentThreadId = result.Item1;
 
-			_currentMethodData.TimeMs = _stopWatch.ElapsedMilliseconds;
+			bool isUsed = false;
+			if ( !_traceStack.IsEmpty ) {
+				foreach ( var threadData in _threadData )
+					if ( threadData.Id == _currentThreadId )
+					{
+						threadData.AddMethod( _currentMethodData );
+						isUsed = true;
+					}
+				if (!isUsed)				
+					_threadData.Add( new ThreadData( _currentThreadId, _currentMethodData ) );
+				
 
-			this.AddToDictionary( _currentThreadId, _currentMethodData );
-
-			_isRunning = false;
-		}
-
-		private void  AddToDictionary(int threadId, MethodData data)
-		{
-			List<MethodData> list;
-			if ( _tempMethodInfo.TryGetValue( threadId, out list ) )
-			{
-				list.Add( data );
-				_tempMethodInfo[ threadId ] = list;
+				_isRecursive = false;
 			}
 			else
-			{
-				list = new List<MethodData>();
-				list.Add( data );
-				_tempMethodInfo.Add( threadId, list );
-			}					
+				_prevStackMethodData = _currentMethodData;
 		}
+
 
 		private MethodData GetFrameInfo()
 		{

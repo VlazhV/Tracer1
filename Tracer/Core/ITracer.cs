@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Core
 {
-	internal interface ITracer
+	public interface ITracer
 	{
 		public void Start();
 		public void Stop();

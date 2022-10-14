@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serialization.Abstraction", "Serialization.Abstraction\Serialization.Abstraction.csproj", "{744A4818-D366-4801-8953-B85FAE2AFBFE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{8400A3C1-534D-458F-8025-55DF20C43279}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{744A4818-D366-4801-8953-B85FAE2AFBFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{744A4818-D366-4801-8953-B85FAE2AFBFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{744A4818-D366-4801-8953-B85FAE2AFBFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8400A3C1-534D-458F-8025-55DF20C43279}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8400A3C1-534D-458F-8025-55DF20C43279}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8400A3C1-534D-458F-8025-55DF20C43279}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8400A3C1-534D-458F-8025-55DF20C43279}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
