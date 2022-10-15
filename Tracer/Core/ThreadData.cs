@@ -20,7 +20,7 @@ namespace Core
 			set { _timeMs = value; }
 		}
 
-		public List<MethodData>? Methods { get { return _methods; } }
+		public List<MethodData> Methods { get { return _methods; }  }
 
 		public void AddMethod(MethodData methodData)
 		{

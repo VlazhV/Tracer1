@@ -5,40 +5,44 @@ namespace Tracer.Serialization.Xml
 {
 
 
-    [XmlRoot( ElementName = "Method" )]
+//    [XmlRoot( ElementName = "Method" )]
     public class MethodData
     {
 
 
-        [XmlAttribute( Form = XmlSchemaForm.Unqualified )]
+        //[XmlAttribute( Form = XmlSchemaForm.Unqualified )]
         public string TimeMs { get; set; } = "";
 
-        [XmlElement( ElementName = "Method" )]
+//        [XmlAttribute( Form = XmlSchemaForm.Unqualified )]
         public string MethodName { get; set; } = "";
 
-        [XmlAttribute( Form = XmlSchemaForm.Unqualified )]
+  //      [XmlAttribute( Form = XmlSchemaForm.Unqualified )]
         public string ClassName { get; set; } = "";
 
-        public MethodData( string methodName, string className, long timeMs )
+        public List<MethodData> Methods { get; set; } = new List<MethodData>();
+
+        public MethodData( string methodName, string className, long timeMs, List<MethodData> methods )
         {
             MethodName = methodName;
-
             ClassName = className;
-
             TimeMs = $"{timeMs}ms";
+            Methods = methods;
 
         }
-
         public MethodData()
         {
 
         }
 
-        public MethodData(Core.MethodData methodData)
+        public MethodData(Core.MethodData method)
         {
-            MethodName = methodData.MethodName;
-            ClassName = methodData.ClassName;
-            TimeMs = $"{methodData.TimeMs}ms";
+            MethodName = method.MethodName;
+            ClassName = method.ClassName;
+            TimeMs = $"{method.TimeMs}ms";
+            foreach (var internalMethod in method.Methods)
+            Methods.Add( new MethodData( internalMethod ) );
+
+
 		}
 
 

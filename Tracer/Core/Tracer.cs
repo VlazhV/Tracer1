@@ -62,7 +62,7 @@ namespace Core
 
 			_currentMethodData = result.Item2 as MethodData;
 
-			_currentMethodData.AddInternalMethod( _prevStackMethodData );
+//			_currentMethodData.AddInternalMethod( _prevStackMethodData );
 
 			_currentMethodData.TimeMs = stopWatch.ElapsedMilliseconds;
 			int currentThreadId = result.Item1;

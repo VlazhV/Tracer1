@@ -14,14 +14,14 @@ public class TraceResult
     }
 
     // Core.TraceResult traceResult
-    List<ThreadData> _traceInfo;
+    List<ThreadData> _traceInfo = new();
 
     public List<ThreadData> TraceInfo { get { return _traceInfo; } set { _traceInfo = value; } }
 
     public TraceResult( Core.TraceResult traceResult )
     {
         foreach( Core.ThreadData threadData in traceResult.TraceInfo )
-            TraceInfo.Add( new ThreadData(threadData));
+            _traceInfo.Add( new ThreadData(threadData));
     }
 
 }
