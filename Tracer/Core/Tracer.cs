@@ -11,11 +11,9 @@ namespace Core
 	public class Tracer : ITracer
 	{		
 		private List<ThreadData> _threadData = new();
-		private ConcurrentStack<(int, MethodData, Stopwatch)> _traceStack = new ConcurrentStack<(int, MethodData, Stopwatch)>();
+		private ConcurrentDictionary<int, ConcurrentStack<(MethodData, Stopwatch)>> _traceStacks = new();
+
 		
-		
-		private MethodData _currentMethodData;
-		private MethodData _prevStackMethodData;
 
 
 
@@ -38,13 +36,15 @@ namespace Core
 		
 		public void Start()
 		{
-			
-			int currentThreadId = Thread.CurrentThread.ManagedThreadId;			
+
+			int currentThreadId = Thread.CurrentThread.ManagedThreadId;
+
+			ConcurrentStack<(MethodData, Stopwatch)> stack = AddOrGet( currentThreadId );
 			Stopwatch stopWatch = new Stopwatch();
 
 
-			_currentMethodData = GetFrameInfo();
-			_traceStack.Push( ( currentThreadId, _currentMethodData, stopWatch) );
+			
+			stack.Push( ( GetFrameInfo(), stopWatch) );
 			
 			
 			stopWatch.Start();
@@ -52,45 +52,55 @@ namespace Core
 
 		public void Stop()
 		{
-		
-			//_stopWatch.Stop();
-			if ( !_traceStack.TryPop( out var result ) )
+			
+			int currentThreadId = Thread.CurrentThread.ManagedThreadId;
+			ConcurrentStack<(MethodData, Stopwatch)> stack = AddOrGet( currentThreadId );
+			( MethodData, Stopwatch ) result;
+			if ( !stack.TryPop( out result ) ) 
 				throw new NullReferenceException( "Trace Stack is empty" );
 
-			Stopwatch stopWatch = result.Item3 as Stopwatch;
+
+			Stopwatch stopWatch = result.Item2 as Stopwatch;
 			stopWatch.Stop();
 
-			_currentMethodData = result.Item2 as MethodData;
-
-//			_currentMethodData.AddInternalMethod( _prevStackMethodData );
-
-			_currentMethodData.TimeMs = stopWatch.ElapsedMilliseconds;
-			int currentThreadId = result.Item1;
+			MethodData currentMethodData = result.Item1 as MethodData;
+			currentMethodData.TimeMs = stopWatch.ElapsedMilliseconds;
+			
 
 			bool isUsed = false;
-			if ( _traceStack.IsEmpty ) {
+			if ( stack.IsEmpty ) {
 				foreach ( var threadData in _threadData )
 					if ( threadData.Id == currentThreadId )
 					{
-						threadData.AddMethod( _currentMethodData );
+						threadData.AddMethod( currentMethodData );
 						isUsed = true;
 					}
 				if (!isUsed)				
-					_threadData.Add( new ThreadData( currentThreadId, _currentMethodData ) );
+					_threadData.Add( new ThreadData( currentThreadId, currentMethodData ) );
 
 			}
 			else
 			{
-				if ( _traceStack.TryPop( out var prev ))
-				{
-					prev.Item2.AddInternalMethod( _currentMethodData );
-					_traceStack.Push( prev );
-				}
 				
+				if (stack.TryPeek (out var prev))
+					prev.Item1.AddInternalMethod( currentMethodData );
 			}
 				
 		}
 
+		private ConcurrentStack<(MethodData, Stopwatch)> AddOrGet(int tid)
+		{
+			if ( _traceStacks.ContainsKey( tid ) )
+			{ 
+				return _traceStacks[tid];
+			}
+			else
+			{
+				var newStack = new ConcurrentStack<(MethodData, Stopwatch)>();
+				while ( !_traceStacks.TryAdd( tid, newStack ) ) ;
+				return newStack;
+			}
+		}
 
 		private MethodData GetFrameInfo()
 		{
@@ -104,12 +114,6 @@ namespace Core
 		}
 
 
-		//private (string, string) GetFrameInfo()
-		//{
-		//	StackTrace stackTrace = new StackTrace();
-		//	var frame = stackTrace.GetFrame( 1 );
-		//	return (frame.GetMethod().Name, frame.GetMethod().ReflectedType.Name);
-		//}
 
 		
 	}

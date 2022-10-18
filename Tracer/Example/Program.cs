@@ -23,13 +23,16 @@ namespace Example
             Thread thread;
 
 
-            thread = new Thread( foo.DoSomething );
+            thread = new Thread( bar.InnerMethod3 );
             thread.Start();
-
-            thread.Join();
             bar.InnerMethod1();
+            bar.InnerMethod2();
+            foo.DoSomething();
+            thread.Join();
+            
             
 
+            //rbar.InnerMethod1();
             TraceResult traceResult = tracer.Result();
             var files = Directory.EnumerateFiles( "TraceResultSerializers", "*.dll" );
             foreach ( var file in files )
