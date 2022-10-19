@@ -13,10 +13,8 @@ namespace Tests
 		private TraceResult _traceResult;
 		[TestInitialize]
 		public void Initialization()
-		{
-			// _traceResult = new TraceResult();
-			// _tracer = new Tracer();
-			// ThreadsHolder.threads = _traceResult;
+		{			
+			
 		}
 
 
@@ -27,33 +25,42 @@ namespace Tests
 		{
 			Tracer tracer = new Tracer();
 			Foo foo = new Foo( tracer );
-			Thread thread;
+			Bar bar = new Bar( tracer );
 
-			thread = new Thread( foo.DoSomething );
-			// new ThreadInfo( tracer, thread, 1 );
+			
+
+			Thread thread = new Thread( bar.InnerMethod3 );			
 			thread.Start();
+			bar.InnerMethod1();
+			bar.InnerMethod2();
+			foo.DoSomething();
+			thread.Join();
 
-			foreach ( var keyValuePair in tracer.ThreadInfoDictionary )
-			{
-				keyValuePair.Key.Join();
-			}
+
 
 			TraceResult traceResult = tracer.Result();
 			traceResult = tracer.Result();
-			Assert.IsNotNull( traceResult );
-			Assert.AreEqual( traceResult.Threads[ 0 ].Id, "1" );
-			Assert.AreEqual( traceResult.Threads.Count, 1 );
-			Assert.IsTrue( traceResult.Threads[ 0 ].TimeInt >= 2900 );
-			Assert.AreEqual( traceResult.Threads[ 0 ].Methods[ 0 ].ClassName, "Foo" );
-			Assert.AreEqual( traceResult.Threads[ 0 ].Methods[ 0 ].Name, "DoSomething" );
-			Assert.AreEqual( traceResult.Threads[ 0 ].Methods[ 0 ].Methods.Count, 2 );
-			Assert.AreEqual( traceResult.Threads[ 0 ].Methods[ 0 ].Methods[ 0 ].Name, "InnerMethod" );
-			Assert.AreEqual( traceResult.Threads[ 0 ].Methods[ 0 ].Methods[ 0 ].ClassName, "Bar" );
-			Assert.IsTrue( traceResult.Threads[ 0 ].Methods[ 0 ].Methods[ 0 ].Time.StartsWith( "2" ) );
-			Assert.IsTrue( traceResult.Threads[ 0 ].Methods[ 0 ].Methods[ 1 ].Time.StartsWith( "7" ) );
-			Assert.IsTrue( traceResult.Threads[ 0 ].Methods[ 0 ].Methods[ 0 ].Methods.Count == 0 );
-			Assert.IsTrue( traceResult.Threads[ 0 ].Methods[ 0 ].Methods[ 1 ].Methods.Count == 0 );
+			Assert.IsNotNull( traceResult );			
+			Assert.AreEqual( 2, traceResult.TraceInfo.Count);
+			Assert.IsTrue  ( traceResult.TraceInfo[ 1 ].TimeMs >= 2800);
+			Assert.AreEqual( "Foo", traceResult.TraceInfo[ 1 ].Methods[ 2 ].ClassName );
+			Assert.AreEqual( "DoSomething", traceResult.TraceInfo[ 1 ].Methods[ 2 ].MethodName );
+			Assert.AreEqual( 3, traceResult.TraceInfo[ 1 ].Methods[ 2 ].Methods.Count );
+			
+			Assert.AreEqual( "InnerMethod1", traceResult.TraceInfo[ 1 ].Methods[ 2 ].Methods[ 0 ].MethodName );
+			Assert.AreEqual( "Bar", traceResult.TraceInfo[ 1 ].Methods[ 2 ].Methods[ 0 ].ClassName );
+			Assert.IsTrue( traceResult.TraceInfo[ 1 ].Methods[ 2 ].Methods[ 0 ].TimeMs >= 200 );
+
+			Assert.AreEqual( "InnerMethod2", traceResult.TraceInfo[ 1 ].Methods[ 2 ].Methods[ 1 ].MethodName );
+			Assert.AreEqual( "Bar", traceResult.TraceInfo[ 1 ].Methods[ 2 ].Methods[ 1 ].ClassName );
+			Assert.IsTrue( traceResult.TraceInfo[ 1 ].Methods[ 2 ].Methods[ 1 ].TimeMs >= 150 );
+
+			Assert.AreEqual( "InnerMethod3", traceResult.TraceInfo[ 1 ].Methods[ 2 ].Methods[ 2 ].MethodName );
+			Assert.AreEqual( "Bar", traceResult.TraceInfo[ 1 ].Methods[ 2 ].Methods[ 2 ].ClassName );
+			Assert.IsTrue  ( traceResult.TraceInfo[ 1 ].Methods[ 2 ].Methods[ 2 ].TimeMs >= 100 );
+
+			Assert.AreEqual(0,  traceResult.TraceInfo[ 1 ].Methods[ 0 ].Methods.Count );
+			Assert.AreEqual(0,  traceResult.TraceInfo[ 1 ].Methods[ 1 ].Methods.Count );
 		}
 	}
-}
 }

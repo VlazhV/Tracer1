@@ -13,9 +13,10 @@ namespace Core
 		private List<ThreadData> _threadData = new();
 		private ConcurrentDictionary<int, ConcurrentStack<(MethodData, Stopwatch)>> _traceStacks = new();
 
-		
-
-
+		public ConcurrentDictionary<int, ConcurrentStack<(MethodData, Stopwatch)>> TraceStacks 
+		{
+			get { return _traceStacks; }
+		}
 
 
 		public TraceResult Result()

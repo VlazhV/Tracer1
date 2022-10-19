@@ -21,7 +21,8 @@ namespace Example
             Foo foo = new Foo( tracer );
             Bar bar = new Bar( tracer );
             Thread thread;
-
+            
+            
 
             thread = new Thread( bar.InnerMethod3 );
             thread.Start();
@@ -32,7 +33,6 @@ namespace Example
             
             
 
-            //rbar.InnerMethod1();
             TraceResult traceResult = tracer.Result();
             var files = Directory.EnumerateFiles( "TraceResultSerializers", "*.dll" );
             foreach ( var file in files )
@@ -49,7 +49,7 @@ namespace Example
                         throw new Exception( $"Serializer {type} not created" );
                     }
                     using var fileStream = new FileStream( $"results/result.{serializer.Format}", FileMode.Create );
-                    serializer.Serialize( traceResult, fileStream );
+                    serializer.Serialize( traceResult, fileStream);
                 }
             }
         }

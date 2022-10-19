@@ -36,7 +36,7 @@ namespace Tracer.Serialization.Xml
 
         public MethodData(Core.MethodData method)
         {
-            MethodName = method.MethodName;
+            MethodName = method.MethodName; 
             ClassName = method.ClassName;
             TimeMs = $"{method.TimeMs}ms";
             foreach (var internalMethod in method.Methods)
