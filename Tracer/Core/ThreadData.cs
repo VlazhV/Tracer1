@@ -6,32 +6,33 @@ namespace Core
 	{
 		int _id;
 		long _timeMs;
-		List<MethodData> _methods = new();
+		IReadOnlyList<MethodData> _methods;
 
 		public int Id 
 		{ 
-			get { return _id; } 
-			set { _id = value; }
+			get { return _id; } 			
 		}
 
 		public long TimeMs	
 		{
-			get { return _timeMs; }
-			set { _timeMs = value; }
+			get { return _timeMs; }		
 		}
 
-		public List<MethodData> Methods { get { return _methods; }  }
+		public IReadOnlyList<MethodData> Methods { get { return _methods; }  }
 
-		public void AddMethod(MethodData methodData)
-		{
-			_methods.Add(methodData);
-		}
+		
 
-		public ThreadData(int id, MethodData methodData )
+		public ThreadData(int id, List<MethodData> methodData )
 		{
 			_id = id;
-			AddMethod( methodData );
+			_methods = methodData;
 		}
 
+		public ThreadData( int id, long timeMs, List<MethodData> methodData )
+		{
+			_id = id;
+			_methods = methodData;
+			_timeMs = timeMs;
+		}
 	}
 }

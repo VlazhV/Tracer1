@@ -24,12 +24,13 @@ namespace Example
             
             
 
-            thread = new Thread( bar.InnerMethod3 );
+            thread = new Thread( foo.DoSomething );
             thread.Start();
             bar.InnerMethod1();
             bar.InnerMethod2();
             foo.DoSomething();
             thread.Join();
+            
             
             
 

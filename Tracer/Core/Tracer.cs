@@ -10,10 +10,10 @@ namespace Core
 {
 	public class Tracer : ITracer
 	{		
-		private List<ThreadData> _threadData = new();
-		private ConcurrentDictionary<int, ConcurrentStack<(MethodData, Stopwatch)>> _traceStacks = new();
+		private List<ThreadInfo> _threadInfo = new();
+		private ConcurrentDictionary<int, Stack<(MethodInfo, Stopwatch)>> _traceStacks = new();
 
-		public ConcurrentDictionary<int, ConcurrentStack<(MethodData, Stopwatch)>> TraceStacks 
+		public ConcurrentDictionary<int, Stack<(MethodInfo, Stopwatch)>> TraceStacks 
 		{
 			get { return _traceStacks; }
 		}
@@ -21,16 +21,22 @@ namespace Core
 
 		public TraceResult Result()
 		{
-			
-			foreach (var threadData in _threadData)
+			List<ThreadData> threadData = new List<ThreadData>();
+
+			foreach (var threadInfo in _threadInfo)
 			{
 				long threadTimeMs = 0;
-				foreach (var method in threadData.Methods)				
+				foreach (var method in threadInfo.Methods)				
 					threadTimeMs += method.TimeMs;
-				threadData.TimeMs = threadTimeMs;
+				threadInfo.TimeMs = threadTimeMs;
 
+				threadData.Add(threadInfo.ToThreadData());
 			}
-			TraceResult traceResult = new( _threadData );
+
+			
+
+
+			TraceResult traceResult = new( threadData );
 			return traceResult;
 		}
 
@@ -40,7 +46,7 @@ namespace Core
 
 			int currentThreadId = Thread.CurrentThread.ManagedThreadId;
 
-			ConcurrentStack<(MethodData, Stopwatch)> stack = AddOrGet( currentThreadId );
+			Stack<(MethodInfo, Stopwatch)> stack = AddOrGet( currentThreadId );
 			Stopwatch stopWatch = new Stopwatch();
 
 
@@ -55,8 +61,8 @@ namespace Core
 		{
 			
 			int currentThreadId = Thread.CurrentThread.ManagedThreadId;
-			ConcurrentStack<(MethodData, Stopwatch)> stack = AddOrGet( currentThreadId );
-			( MethodData, Stopwatch ) result;
+			Stack<(MethodInfo, Stopwatch)> stack = _traceStacks[ currentThreadId ];
+			( MethodInfo, Stopwatch ) result;
 			if ( !stack.TryPop( out result ) ) 
 				throw new NullReferenceException( "Trace Stack is empty" );
 
@@ -64,32 +70,33 @@ namespace Core
 			Stopwatch stopWatch = result.Item2 as Stopwatch;
 			stopWatch.Stop();
 
-			MethodData currentMethodData = result.Item1 as MethodData;
-			currentMethodData.TimeMs = stopWatch.ElapsedMilliseconds;
+			MethodInfo currentMethodInfo = result.Item1 as MethodInfo;
+			currentMethodInfo.TimeMs = stopWatch.ElapsedMilliseconds;
 			
 
 			bool isUsed = false;
-			if ( stack.IsEmpty ) {
-				foreach ( var threadData in _threadData )
-					if ( threadData.Id == currentThreadId )
+			if ( stack.Count == 0 ) {
+				foreach ( var threadInfo in _threadInfo )
+					if ( threadInfo.Id == currentThreadId )
 					{
-						threadData.AddMethod( currentMethodData );
+						threadInfo.Methods.Add( currentMethodInfo );
 						isUsed = true;
+						break;
 					}
 				if (!isUsed)				
-					_threadData.Add( new ThreadData( currentThreadId, currentMethodData ) );
+					_threadInfo.Add( new ThreadInfo( currentThreadId, currentMethodInfo ) );
 
 			}
 			else
 			{
 				
 				if (stack.TryPeek (out var prev))
-					prev.Item1.AddInternalMethod( currentMethodData );
+					prev.Item1.Methods.Add( currentMethodInfo );
 			}
 				
 		}
 
-		private ConcurrentStack<(MethodData, Stopwatch)> AddOrGet(int tid)
+		private Stack<(MethodInfo, Stopwatch)> AddOrGet(int tid)
 		{
 			if ( _traceStacks.ContainsKey( tid ) )
 			{ 
@@ -97,13 +104,13 @@ namespace Core
 			}
 			else
 			{
-				var newStack = new ConcurrentStack<(MethodData, Stopwatch)>();
+				var newStack = new Stack<(MethodInfo, Stopwatch)>();
 				while ( !_traceStacks.TryAdd( tid, newStack ) ) ;
 				return newStack;
 			}
 		}
 
-		private MethodData GetFrameInfo()
+		private MethodInfo GetFrameInfo()
 		{
 			StackTrace stackTrace = new StackTrace();
 			var frame = stackTrace.GetFrame( 2 );			
@@ -111,7 +118,7 @@ namespace Core
 			string methodName = frame.GetMethod().Name;
 			string className = frame.GetMethod().ReflectedType.Name;
 
-			return new MethodData( methodName, className);
+			return new MethodInfo( methodName, className);
 		}
 
 

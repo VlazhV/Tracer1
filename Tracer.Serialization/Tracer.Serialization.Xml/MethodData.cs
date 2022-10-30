@@ -40,7 +40,7 @@ namespace Tracer.Serialization.Xml
             ClassName = method.ClassName;
             TimeMs = $"{method.TimeMs}ms";
             foreach (var internalMethod in method.Methods)
-            Methods.Add( new MethodData( internalMethod ) );
+               Methods.Add( new MethodData( internalMethod ) );
 
 
 		}

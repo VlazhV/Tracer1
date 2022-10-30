@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Xml.Serialization;
 using Tracer.Serialization.Xml;
-using Core;
+
 
 namespace Tracer.Serialization.Xml;
 
@@ -21,7 +21,10 @@ public class TraceResult
     public TraceResult( Core.TraceResult traceResult )
     {
         foreach( Core.ThreadData threadData in traceResult.TraceInfo )
-            _traceInfo.Add( new ThreadData(threadData));
+        {
+			_traceInfo.Add( new ThreadData( threadData ) );
+		}
+
     }
 
 }
